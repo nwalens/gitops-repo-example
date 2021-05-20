@@ -1,0 +1,28 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: application
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+spec:
+  ignoreDifferences:
+  - group: secrets.company.io
+    kind: ExternalSecret
+    jsonPointers:
+    - /spec/configuration/triggerUpdate
+  destination:
+    namespace: destination-namespace
+    server: 'https://kubernetes.default.svc'
+  project: application-project
+  source:
+    path: application-path
+    repoURL: >-
+      https://git.company.com/argocd/applications/microservice-group.git
+    targetRevision: HEAD
+  syncPolicy:
+    automated:
+      prune: false
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

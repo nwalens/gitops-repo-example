@@ -1,0 +1,17 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+- ../../../services/email-consumer-api
+namespace: stdv-common-backend
+namePrefix: email-consumer-api-
+commonLabels:
+  apm.company.io/language: dotnetcore
+  app.kubernetes.io/name: email-consumer-api
+  app.kubernetes.io/part-of: common-backend
+  app.company.io/environment: staging
+  app.company.io/team: development
+  apps.company.io/generated-by: GoCD
+images:
+- name: app-image
+  newName: quay.io/company/email-consumer-api
+  newTag: v1.0.0

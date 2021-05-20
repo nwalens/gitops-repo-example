@@ -1,0 +1,32 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: project
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "0"
+spec:
+  clusterResourceWhitelist:
+    - group: '*'
+      kind: '*'
+    - group: security.openshift.io
+      kind: SecurityContextConstraints
+  description: Devlopment Applications
+  destinations:
+    - namespace: ts*
+      server: 'https://kubernetes.default.svc'
+    - namespace: ut*
+      server: 'https://kubernetes.default.svc'
+    - namespace: dv*
+      server: 'https://kubernetes.default.svc'
+    - namespace: pr*
+      server: 'https://kubernetes.default.svc'
+    - namespace: qa*
+      server: 'https://kubernetes.default.svc'
+    - namespace: st*
+      server: 'https://kubernetes.default.svc'
+    - namespace: dv*
+      server: 'https://kubernetes.default.svc'
+  sourceRepos:
+    - '*'
+status: {}

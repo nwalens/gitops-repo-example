@@ -1,0 +1,9 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+- ../../openshift-compat
+- resources/10-deployment.yaml
+- resources/10-service.yaml
+- resources/10-route.yaml
+- resources/10-service-account.yaml
+- resources/10-hpa.yaml

@@ -1,0 +1,93 @@
+#!/bin/bash
+
+#. .functions/gitops-setup-functions.sh
+. .functions/gitops-base-functions.sh
+. .functions/kustomize-functions.sh
+. .functions/gitops-helper-functions.sh
+. .functions/gitops-builder-functions.sh
+
+while getopts "c:a:be:f:g:i:N:n:pS:sT:t:vhEL:" opt; do
+    case ${opt} in
+        c) kustomize_components="${kustomize_components} $OPTARG"
+        ;;
+        b) setup_base=true
+        ;;
+        s) setup_service=true
+        ;;
+        v) setup_environment=true
+        ;;
+        f) source $OPTARG
+        ;;
+        T) gitopsTemplate=$OPTARG
+        ;;
+        t) componentType=$OPTARG
+        ;;
+        g) appGroup=$OPTARG
+        ;;
+        e) environment=$OPTARG
+        ;;
+        E) setupSecret=true
+        ;;
+        p) pushToGit=true
+        ;;
+        n) appName=$OPTARG
+        ;;
+        N) teamName=$OPTARG
+        ;;
+        a) appType=$OPTARG
+        ;;
+        i) imagePatch="${imagePatch} $OPTARG"
+        ;;
+        S) subscribeToCluster=$OPTARG
+        ;;
+        h) print_help && exit 0
+        ;;
+        L) extraLabels=$OPTARG
+        ;;
+        *) print_help && exit 1
+        ;;
+    esac
+done
+
+[[ $# -lt 1 ]] && print_help && exit 0
+
+echo "Chosen options: $@"
+
+check_vars
+
+if [[ ! -d templates/default-template ]]; then
+    echo "Invalid repository"
+    exit 1
+fi
+
+if [[ "${pushToGit}" == "true" ]]; then
+    echo "Make sure we are up to date"
+    git pull --rebase
+fi
+
+[[ ${setup_base} == "true" ]] && prepare_base ${appGroup} ${gitopsTemplate}
+[[ ${setup_service} == "true" ]] && prepare_service ${appGroup} ${appName} ${componentType} ${gitopsTemplate}
+[[ ${setup_environment} == "true" ]] && prepare_environment ${appGroup} ${appName} ${environment} ${teamName} ${componentType} ${gitopsTemplate} ${subscribeToCluster}
+[[ ! "x${imagePatch}" == "x" ]] && update_image ${appGroup} ${appName} ${environment} "${imagePatch}"
+[[ ! "x${subscribeToCluster}" == "x" ]] && subscribe_to_cluster ${appGroup} ${appName} ${environment} ${subscribeToCluster}
+
+if [[ "${pushToGit}" == "true" ]]; then
+    echo "Updating gitops repository"
+    git add *
+    git commit -m "Add service ${appName} in ${appGroup} ${environment} environment"
+    pushed="false"
+    count=0
+    until [[ $pushed == "true" ]]; do
+        echo "Update repo"
+        git pull --rebase
+        echo "Push changes to Git"
+        git push
+        if [[ $? != 0 ]]; then
+            [[ $count -gt 3 ]] && exit 1
+            sleep 5
+            let "count=count+1"
+        else
+            pushed=true
+        fi
+    done
+fi

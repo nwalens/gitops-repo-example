@@ -1,0 +1,12 @@
+varReference:
+- path: metadata/namespace
+  kind: Deployment
+- path: users
+  kind: SecurityContextConstraints
+- path: groups
+  kind: SecurityContextConstraints
+- path: spec/volumeClaimTemplates/spec/resources/requests/storage
+  kind: StatefulSet
+- path: spec/volumeClaimTemplates/spec/storageClassName
+  kind: StatefulSet
+# Values from https://github.com/kubernetes-sigs/kustomize/blob/master/api/konfig/builtinpluginconsts/namereference.go
