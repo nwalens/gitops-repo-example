@@ -1,6 +1,6 @@
 services:
   web:
     build: .
-    container_name: ${appName:nginx}
+    container_name: ${appName}
     ports:
       - "8080:80"
