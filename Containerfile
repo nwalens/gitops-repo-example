@@ -1,4 +1,4 @@
-FROM https://quay.io/repository/almalinuxorg/10-minimal
+FROM quay.io/almalinuxorg/10-minimal:10
 
 USER 0
 
