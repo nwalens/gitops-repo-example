@@ -1,0 +1,27 @@
+name: Build Image & Deploy
+run-name: ${{ github.actor }} is building a new container image 🚀
+on: [push]
+env:
+  appName: fintool
+  imageRegistry: quay.io/fintool
+jobs:
+  Build-Deploy-Image:
+    runs-on: [self-hosted, linux, ARM64]
+    steps:
+      - run: echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event."
+      - run: echo "🐧 This job is now running on a ${{ runner.os }} server hosted locally!"
+      - run: echo "🔎 The name of your branch is ${{ github.ref }} and your repository is ${{ github.repository }}."
+      - name: Check out repository code
+        uses: actions/checkout@v5
+      - run: echo "💡 The ${{ github.repository }} repository has been cloned to the runner."
+      - run: echo "🖥️ The workflow is now ready to build your code on the runner."
+      - name: List files in the repository
+        run: |
+          ls ${{ github.workspace }}
+      - name: Build Image
+        run: podman build -t ${{ env.appName }}:${{ github.ref }} .
+      - name: Stop running image
+        run: podman stop ${{ env.appName }}
+      - name: Run New Image
+        run: podman run -d ${{ env.appName }}:${{ github.ref }} --name ${{ env.appName }}
+      - run: echo "🍏 This job's status is ${{ job.status }}."
