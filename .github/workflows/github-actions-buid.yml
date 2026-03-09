@@ -1,5 +1,5 @@
 name: Build Image & Deploy
-run-name: ${{ github.actor }} is building a new container image 🚀
+run-name: ${{ github.ref_name }} build 🚀
 on:
   push:
     tags:
