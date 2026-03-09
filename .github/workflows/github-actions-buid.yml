@@ -24,6 +24,7 @@ jobs:
       - name: Build Image & Deploy
         run: |
           podman build --cgroup-manager=cgroupfs -t ${{ env.appName }}:${{ github.ref_name }} .
-          podman stop ${{ env.appName }}
+          [[ ! podman stop ${{ env.appName }} ]] && echo "Container was not running!"
+          echo "Starting Container"
           podman run -d --name ${{ env.appName }} ${{ env.appName }}:${{ github.ref_name }}
       - run: echo "🍏 This job's status is ${{ job.status }}."
