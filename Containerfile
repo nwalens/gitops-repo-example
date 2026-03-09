@@ -1,11 +1,11 @@
 FROM quay.io/almalinuxorg/10-base:10
 
-USER 0
+# Install Nginx
+RUN dnf install -y nginx && \
+    dnf clean all
 
-RUN dnf update -y
+# Expose port 80
+EXPOSE 80
 
-ADD * /opt/lala
-
-USER 1001
-
-ENTRYPOINT ["/bin/sh"]
+# Start Nginx in the foreground
+CMD ["nginx", "-g", "daemon off;"]

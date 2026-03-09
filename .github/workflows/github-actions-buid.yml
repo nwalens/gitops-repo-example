@@ -23,8 +23,6 @@ jobs:
           ls ${{ github.workspace }}
       - name: Build Image & Deploy
         run: |
-          podman build --cgroup-manager=cgroupfs -t ${{ env.appName }}:${{ github.ref_name }} .
-          [[ ! $(podman stop --cgroup-manager=cgroupfs ${{ env.appName }}) ]] || echo "Container was not running!"
-          echo "Starting Container"
-          podman run --replace -ti --cgroup-manager=cgroupfs -d --name ${{ env.appName }} ${{ env.appName }}:${{ github.ref_name }}
+          appName=${{ env.appName }} podman compose -f docker-compose.yaml down || echo "Application was not running"
+          appName=${{ env.appName }} podman compose -f docker-compose.yaml up --detach
       - run: echo "🍏 This job's status is ${{ job.status }}."
