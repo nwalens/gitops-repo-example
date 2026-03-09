@@ -21,10 +21,9 @@ jobs:
       - name: List files in the repository
         run: |
           ls ${{ github.workspace }}
-      - name: Build Image
-        run: podman build -t ${{ env.appName }}:${{ github.ref_name }} .
-      - name: Stop running image
-        run: podman stop ${{ env.appName }}
-      - name: Run New Image
-        run: podman run -d ${{ env.appName }}:${{ github.ref_name }} --name ${{ env.appName }}
+      - name: Build Image & Deploy
+        run: |
+          podman build --cgroup-manager=cgroupfs -t ${{ env.appName }}:${{ github.ref_name }} .
+          podman stop ${{ env.appName }}
+          podman run -d --name ${{ env.appName }} ${{ env.appName }}:${{ github.ref_name }}
       - run: echo "🍏 This job's status is ${{ job.status }}."
