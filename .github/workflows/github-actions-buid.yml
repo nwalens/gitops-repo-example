@@ -1,6 +1,9 @@
 name: Build Image & Deploy
 run-name: ${{ github.actor }} is building a new container image 🚀
-on: [push]
+on:
+  push:
+    tags:
+      - "v*"
 env:
   appName: fintool
   imageRegistry: quay.io/fintool
@@ -19,9 +22,9 @@ jobs:
         run: |
           ls ${{ github.workspace }}
       - name: Build Image
-        run: podman build -t ${{ env.appName }}:${{ github.ref }} .
+        run: podman build -t ${{ env.appName }}:$${{ github.ref_name }} .
       - name: Stop running image
         run: podman stop ${{ env.appName }}
       - name: Run New Image
-        run: podman run -d ${{ env.appName }}:${{ github.ref }} --name ${{ env.appName }}
+        run: podman run -d ${{ env.appName }}:${{ github.ref_name }} --name ${{ env.appName }}
       - run: echo "🍏 This job's status is ${{ job.status }}."
